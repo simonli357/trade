@@ -26,7 +26,11 @@ def fetch_and_plot_data(start_date, end_date, tickers):
 
 start_date = input("Enter the starting date (YYYY-MM-DD): ")
 end_date = input("Enter the ending date (YYYY-MM-DD): ")
-tickers = ["SOUN", "SOUNW", "NVDA", "PLTR", "AI", "GOOGL", "TSLA"]
+tickers = input("Enter the stock symbols separated by commas (ex: GOOGL,TSLA): ").strip()
+if not tickers:
+    tickers = ["SOUN", "SOUNW", "NVDA", "PLTR", "AI", "GOOGL", "TSLA"]
+else:
+    tickers = [symbol.strip() for symbol in tickers.split(",")]
 
 # Fetch and plot the data
 fetch_and_plot_data(start_date, end_date, tickers)
