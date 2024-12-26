@@ -1,6 +1,7 @@
 import pandas as pd
 import datetime
 import yfinance as yf
+import os
 
 pd.set_option('display.max_columns', None)  # Show all columns
 pd.set_option('display.width', 1000)       # Adjust display width for better console output
@@ -67,7 +68,7 @@ def calculate_profit(csv_file, price_target, stock_price):
         return None
 
 if __name__ == "__main__":
-    csv_file = input("Enter the path to the options CSV file: ")
+    csv_file = input("Enter the path to the options CSV file (e.g., options\SOUN_options_2025-07-18.csv): ")
     price_target = float(input("Enter your price target at expiration: "))
     
     try:
@@ -75,7 +76,7 @@ if __name__ == "__main__":
     except IndexError:
         raise ValueError("CSV file name does not follow the expected format (e.g., SOUN_options_2025-07-18.csv).")
     
-    stock_ticker = csv_file.split("_")[0].upper()
+    stock_ticker = os.path.basename(csv_file).split("_")[0].upper()
     stock = yf.Ticker(stock_ticker)
     stock_price = stock.history(period="1d")["Close"].iloc[-1]
     print(f"Current stock price: {stock_price:.2f}")
@@ -86,6 +87,6 @@ if __name__ == "__main__":
         print("\nOptions Data with Profit Calculations:")
         print(options_data_with_profits)
         
-        output_file = f"{stock_ticker}_profit_{expiration_date}_{int(price_target)}.csv"
+        output_file = f"return/{stock_ticker}_profit_{expiration_date}_{int(price_target)}.csv"
         options_data_with_profits.to_csv(output_file, index=False)
         print(f"\nFiltered results saved to {output_file}")

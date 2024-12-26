@@ -64,7 +64,7 @@ if __name__ == "__main__":
                 print(options_table)
                 
                 # Save to CSV
-                output_file = f"{stock_ticker}_options_{expiry_date}.csv"
+                output_file = f"options\{stock_ticker}_options_{expiry_date}.csv"
                 options_table.to_csv(output_file, index=False)
                 print(f"\nOptions table saved to {output_file}")
     
