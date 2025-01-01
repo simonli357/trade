@@ -161,25 +161,40 @@ class OptionCalculatorUI(QMainWindow):
     def calculate_returns(self):
         target_price = self.slider.value()
         try:
+            # Calculate returns for CALLS
             calls_data = self.options_data[self.options_data["Type"] == "Call"].copy()
-
-            # Calculate the mid-price of the option (average of bid and ask)
             calls_data["premium"] = ((calls_data["bid"] + calls_data["ask"]) / 2).round(2)
             calls_data["break_even"] = (calls_data["strike"] + calls_data["premium"]).round(2)
 
-            # Option profit and % profit
+            # Profit and percent profit for calls
             calls_data["option_profit"] = (
                 ((target_price - calls_data["strike"]).clip(lower=0) * 100 - calls_data["premium"] * 100).round(2)
             )
             calls_data["option_percent_profit"] = (
                 (calls_data["option_profit"] / (calls_data["premium"] * 100) * 100).round(2)
             )
-
-            # Remove invalid profit values
             calls_data.loc[calls_data["break_even"] > target_price, ["option_profit", "option_percent_profit"]] = None
 
+            # Calculate returns for PUTS
+            puts_data = self.options_data[self.options_data["Type"] == "Put"].copy()
+            puts_data["premium"] = ((puts_data["bid"] + puts_data["ask"]) / 2).round(2)
+            puts_data["break_even"] = (puts_data["strike"] - puts_data["premium"]).round(2)
+
+            # Profit and percent profit for puts
+            puts_data["option_profit"] = (
+                ((puts_data["strike"] - target_price).clip(lower=0) * 100 - puts_data["premium"] * 100).round(2)
+            )
+            puts_data["option_percent_profit"] = (
+                (puts_data["option_profit"] / (puts_data["premium"] * 100) * 100).round(2)
+            )
+            puts_data.loc[puts_data["break_even"] < target_price, ["option_profit", "option_percent_profit"]] = None
+
+            # Combine calls and puts
+            combined_data = pd.concat([calls_data, puts_data])
+
             # Display updated data
-            self.display_data(calls_data)
+            self.display_data(combined_data)
+
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Error calculating returns: {e}")
 
