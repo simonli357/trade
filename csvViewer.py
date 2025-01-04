@@ -14,7 +14,6 @@ class OptionCalculatorUI(QMainWindow):
         super().__init__()
         self.setWindowTitle("Options Calculator")
         self.setGeometry(100, 100, 1000, 800)
-        self.font = 12
 
         # Central widget and layout
         self.central_widget = QWidget()
