@@ -14,6 +14,7 @@ class OptionCalculatorUI(QMainWindow):
         super().__init__()
         self.setWindowTitle("Options Calculator")
         self.setGeometry(100, 100, 1000, 800)
+        self.font = 12
 
         # Central widget and layout
         self.central_widget = QWidget()
@@ -21,8 +22,16 @@ class OptionCalculatorUI(QMainWindow):
         self.layout = QVBoxLayout()
         self.central_widget.setLayout(self.layout)
 
-        # Auto-adjust font size based on screen resolution
-        self.adjust_font_size()
+        # # Auto-adjust font size based on screen resolution
+        # self.adjust_font_size()
+
+        # Input field to change font size
+        self.font_size_input = QLineEdit()
+        self.font_size_input.setPlaceholderText("Enter font size (e.g. 12)")
+        self.layout.addWidget(self.font_size_input)
+
+        # Connect the input field to handle the Enter key press
+        self.font_size_input.returnPressed.connect(self.adjust_font_size)
 
         # Input for stock ticker
         self.ticker_label = QLabel("Enter Stock Ticker:")
@@ -298,14 +307,18 @@ class OptionCalculatorUI(QMainWindow):
 
     def adjust_font_size(self):
         """Dynamically adjust font size based on screen resolution."""
-        screen = self.screen().size()  # Get screen resolution
-        base_width = 1920  # Assumed base resolution width
-        scaling_factor = screen.width() / base_width
+        try:
+            screen = self.screen().size()  # Get screen resolution
+            base_width = 1920  # Assumed base resolution width
+            scaling_factor = screen.width() / base_width
+            font_size = int(self.font_size_input.text())
 
-        # Apply scaled font to the entire application
-        font = QFont()
-        font.setPointSizeF(12 * scaling_factor)  # Scale the font size
-        self.setFont(font)
+            # Apply scaled font to the entire application
+            font = QFont()
+            font.setPointSizeF(font_size * scaling_factor)  # Scale the font size
+            self.setFont(font)
+        except ValueError:
+            print("Please enter a valid number for the font size.")
 
     def resizeEvent(self, event):
         """Ensure table dynamically resizes with the window."""
