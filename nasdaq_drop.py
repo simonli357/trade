@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 
 # Parameters
 ticker = "^IXIC"
-year = "2016"
+year = "2024"
 start_date = year + "-01-01"
 end_date = year + "-12-31"
-threshold = -2  # Threshold for drops in percentage (negative for drops)
+threshold = -2.5  # Threshold for drops in percentage (negative for drops)
 
 # Determine threshold direction
 if threshold < 0:
@@ -19,7 +19,7 @@ else:
     name2 = "rose"
 
 # Download data
-data = yf.download(ticker, start=start_date, end=end_date)
+data = yf.download(ticker, start=start_date, end=end_date, auto_adjust=False)
 
 # Calculate daily percentage changes
 data['Daily Change (%)'] = data['Adj Close'].pct_change() * 100
@@ -46,6 +46,7 @@ print(f"Standard Deviation: {std_dev_change:.2f}%\n")
 
 # Print extreme days
 print(f"Days in {start_date[:4]} where NASDAQ {name2} more than {abs(threshold)}%:")
+pd.set_option('display.max_rows', None)
 print(extreme_days)
 print(f"Number of such days: {len(extreme_days)}")
 
