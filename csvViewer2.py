@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QDate, QPropertyAnimation, QEasingCurve, QTimer
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QTextCharFormat, QBrush, QColor, QFont, QIntValidator, QDoubleValidator
 import random
+from yahooquery import Ticker
 
 class OptionCalculatorUI(QMainWindow):
     def __init__(self):
@@ -332,11 +333,26 @@ class OptionCalculatorUI(QMainWindow):
             return
 
         try:
-            stock = yf.Ticker(stock_ticker)
-            print(stock)
+            stock = Ticker(stock_ticker)
+            # print(stock)
+            options = stock.option_chain
+            option_table = options.index.format()
+            i=0
+            date_table = []
+            if not option_table:
+                print("No options data available for this stock.")
+            else:
+                # print("\nAvailable Expiration Dates:")
+                for date in (option_table):
+                    trim = date.strip(stock_ticker).strip().strip('calls').strip('puts').strip()
+                    if trim != '':
+                        date_table.append(trim)
+                        print(f"{i}. {trim}")
+                        i += 1
+                # print(date_table)
             # self.valid_expiration_dates = stock.options
             self.valid_expiration_dates = [
-                pd.to_datetime(date).strftime("%Y-%m-%d") for date in stock.options
+                pd.to_datetime(date).strftime("%Y-%m-%d") for date in date_table
             ]
 
             if not self.valid_expiration_dates:
@@ -394,15 +410,18 @@ class OptionCalculatorUI(QMainWindow):
 
         stock_ticker = self.ticker_input.text().strip().upper()
         try:
-            stock = yf.Ticker(stock_ticker)
-            options_chain = stock.option_chain(self.expiration_date)
+            # stock = yf.Ticker(stock_ticker)
+            stock = Ticker(stock_ticker)
+            # print(stock)
+            options_chain = stock.option_chain.loc[stock_ticker,self.expiration_date]
 
             # Combine calls and puts
-            calls = options_chain.calls
-            puts = options_chain.puts
-            calls["Type"] = "Call"
-            puts["Type"] = "Put"
-            self.options_data = pd.concat([calls, puts])
+            # calls = options_chain.calls
+            # puts = options_chain.puts
+            # calls["Type"] = "Call"
+            # puts["Type"] = "Put"
+            # self.options_data = pd.concat([calls, puts])
+            self.options_data = options_chain
 
             # Display the initial data
             self.display_data(self.options_data)
