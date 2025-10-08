@@ -5,7 +5,7 @@ from PyQt5.QtCore import QDate, Qt
 import yfinance as yf
 from datetime import date as datetime_date
 import random
-
+import time
 
 class EarningsCalendar(QMainWindow):
     def __init__(self):
@@ -46,14 +46,29 @@ class EarningsCalendar(QMainWindow):
     def fetch_earnings_dates(self):
         earnings_dates = {}
         for ticker in self.tickers:
-            stock = yf.Ticker(ticker)
             try:
+                stock = yf.Ticker(ticker)
+                print(stock)
                 calendar = stock.calendar
-                earnings_date = calendar.get('Earnings Date', [None])[0]  # First earnings date
+                print(calendar)
+                earnings_date = calendar.get('Earnings Date', [None])[0]
                 earnings_dates[ticker] = earnings_date
             except Exception as e:
                 earnings_dates[ticker] = f'Error: {str(e)}'
+            time.sleep(1)  # Delay to avoid triggering 429
         return earnings_dates
+
+    # def fetch_earnings_dates(self):
+    #     earnings_dates = {}
+    #     for ticker in self.tickers:
+    #         stock = yf.Ticker(ticker)
+    #         try:
+    #             calendar = stock.calendar
+    #             earnings_date = calendar.get('Earnings Date', [None])[0]  # First earnings date
+    #             earnings_dates[ticker] = earnings_date
+    #         except Exception as e:
+    #             earnings_dates[ticker] = f'Error: {str(e)}'
+    #     return earnings_dates
 
     def highlight_earnings_dates(self):
         user_input = self.ticker_input.text()
